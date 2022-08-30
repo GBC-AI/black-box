@@ -1,0 +1,3 @@
+[submodule "docker/solana"]
+	path = docker/solana
+	url = https://github.com/GBC-AI/solana.git
