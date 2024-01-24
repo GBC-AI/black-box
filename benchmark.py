@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import uuid
 import time
+import re
 
 """
 В чёрном ящике должен быть параметр, задающий время ожидания в секундах между запуском системы и началом benchmark-a.
@@ -32,6 +33,11 @@ def parse_logs(file_name):
         if "drop rate:" in line:
             tmp = line.split(" ")
             results["drop_rate"] = float(tmp[-1].rstrip())
+        for type_time, match_obj in {type_time: re.search(f"{type_time}\s+(.*)", line) for type_time in ["real", "user", "sys"]}.items():
+            if match_obj:
+                time_str = match_obj.group(1)  # 1m30.734s is 90743ms
+                time_split = time_str.split("m")
+                results[f"{type_time}_time_rate"] = int((float(time_split[0]) * 60 + float(time_split[1].strip("s"))) * 1000)
     return results
 
 
@@ -72,6 +78,12 @@ def blackbox(delays: list, delay_iters: int, factory_path: str, results_path: st
         "AVERAGE_DROPRATE_BENCH1",
         "AVERAGE_TPS_BENCH2",
         "AVERAGE_DROPRATE_BENCH2",
+        "REAL_TIME_RATE_BENCH1",
+        "USER_TIME_RATE_BENCH1",
+        "SYS_TIME_RATE_BENCH1",
+        "REAL_TIME_RATE_BENCH2",
+        "USER_TIME_RATE_BENCH2",
+        "SYS_TIME_RATE_BENCH2"
     ]
     df = pd.DataFrame(columns=column_names)
     df["DELAY"] = pd.Series(np.repeat(delays, delay_iters))
@@ -85,7 +97,7 @@ def blackbox(delays: list, delay_iters: int, factory_path: str, results_path: st
             print("Starting blockchain...")
             chain_uid = uuid.uuid4().hex
             subprocess.run(
-                f"python3 start_chain.py -v=3 -e=test_blockchain -c=config.toml -r=us-east-1 -u {chain_uid}",
+                f"python3 start_chain.py -v=3 -i=t2.2xlarge -e=test_blockchain -c=config.toml -r=us-east-1 -u {chain_uid}",
                 shell=True,
                 env=current_env,
                 cwd=factory_path,
@@ -109,7 +121,7 @@ def blackbox(delays: list, delay_iters: int, factory_path: str, results_path: st
             with open(output_file, "w") as out_file:
                 out_file.write(f"BENCHMARK 1, delay {delay} sec \n")
                 subprocess.run(
-                    'docker run -it --rm --net=host -e NDEBUG=1 timofeykulakov/solana_simulations:1.0 bash -c "./multinode-demo/bench-tps.sh --entrypoint '
+                    'docker run -it --rm --net=host -e NDEBUG=1 timofeykulakov/solana_simulations:1.0 bash -c "time ./multinode-demo/bench-tps.sh --entrypoint '
                     + public_ip
                     + ":8001 --faucet "
                     + public_ip
@@ -117,6 +129,7 @@ def blackbox(delays: list, delay_iters: int, factory_path: str, results_path: st
                     shell=True,
                     text=True,
                     stdout=out_file,
+                    stderr=out_file
                 )
             # get results from logs
             results = parse_logs(output_file)
@@ -124,13 +137,16 @@ def blackbox(delays: list, delay_iters: int, factory_path: str, results_path: st
             # add them to dataframe
             df.at[idx, "AVERAGE_TPS_BENCH1"] = results["average_tps"]
             df.at[idx, "AVERAGE_DROPRATE_BENCH1"] = results["drop_rate"]
+            df.at[idx, "REAL_TIME_RATE_BENCH1"] = results["real_time_rate"]
+            df.at[idx, "USER_TIME_RATE_BENCH1"] = results["user_time_rate"]
+            df.at[idx, "SYS_TIME_RATE_BENCH1"] = results["sys_time_rate"]
 
             # benchmark 2
             print("Starting benchmark 2 without delay...")
             with open(output_file, "a") as out_file:
                 out_file.write("BENCHMARK 2, no delay \n")
                 subprocess.run(
-                    'docker run -it --rm --net=host -e NDEBUG=1 timofeykulakov/solana_simulations:1.0 bash -c "./multinode-demo/bench-tps.sh --entrypoint '
+                    'docker run -it --rm --net=host -e NDEBUG=1 timofeykulakov/solana_simulations:1.0 bash -c "time ./multinode-demo/bench-tps.sh --entrypoint '
                     + public_ip
                     + ":8001 --faucet "
                     + public_ip
@@ -138,6 +154,7 @@ def blackbox(delays: list, delay_iters: int, factory_path: str, results_path: st
                     shell=True,
                     text=True,
                     stdout=out_file,
+                    stderr=out_file
                 )
             # get results from logs
             results = parse_logs(output_file)
@@ -145,6 +162,9 @@ def blackbox(delays: list, delay_iters: int, factory_path: str, results_path: st
             # add them to dataframe
             df.at[idx, "AVERAGE_TPS_BENCH2"] = results["average_tps"]
             df.at[idx, "AVERAGE_DROPRATE_BENCH2"] = results["drop_rate"]
+            df.at[idx, "REAL_TIME_RATE_BENCH2"] = results["real_time_rate"]
+            df.at[idx, "USER_TIME_RATE_BENCH2"] = results["user_time_rate"]
+            df.at[idx, "SYS_TIME_RATE_BENCH2"] = results["sys_time_rate"]
 
             print("End transactions")
             chain_stop(chain_uid, factory_path)
@@ -152,8 +172,9 @@ def blackbox(delays: list, delay_iters: int, factory_path: str, results_path: st
             # save current state to csv
             df.to_csv(results_path, index=False)
 
+
 blackbox(
-    delays=np.linspace(20, 90, 8),
+    delays=np.linspace(0, 90, 10),
     delay_iters=10,
     factory_path="/Users/19846310/personal/GBC-AI/factory/",
     results_path="/Users/19846310/personal/GBC-AI/black-box/out.csv",
