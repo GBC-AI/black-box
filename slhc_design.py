@@ -67,11 +67,12 @@ def parse_logs(file_name: str):
 
 # gets UID of chain and calls stop_chain.py
 def chain_stop(chain_uid: str, factory_path: str):
-    chain_stop = subprocess.run("python3 stop_chain.py -u " + chain_uid, shell=True, cwd=factory_path)
+    chain_stop = subprocess.run("python3 destroy_chain.py -u " + chain_uid, shell=True, cwd=factory_path)
     if not chain_stop.returncode:
         print("Chain %s successfully stopped" % chain_uid)
     else:
         print(chain_stop.stderr)
+
 
 def blackbox(data_path: str, factory_path: str, results_path: str, iters: int = 1, delay: int = 80):
     """
