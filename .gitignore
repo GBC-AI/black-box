@@ -131,5 +131,6 @@ dmypy.json
 
 # CSV files
 *.csv
+!data/slhc_*
 # output directory
 output/
