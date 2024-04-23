@@ -31,7 +31,7 @@ SOLANA_PARAMS = [
 ]
 
 FACTORY_PATH = "/Users/19846310/personal/GBC-AI/factory/"
-DATA_FILE = "out_slhc_design_train_100.csv"
+DATA_FILE = "slhc_design_train_100.csv"
 
 current_env = os.environ.copy()
 current_dir = os.path.dirname(os.path.realpath(__file__))
