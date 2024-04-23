@@ -13,11 +13,11 @@ from surrogate_optimization import BayesianOptimizer
 провести эксперимент с 4мя AF функциями: UCB, EI, TS, DYCORS
 параметры X:
 - NUM_THREADS
-- TICKS_PER_SLOT
+- DEFAULT_TICKS_PER_SLOT
 - RECV_BATCH_MAX_CPU
 - ITER_BATCH_SIZE
-- HASHES_PER_SECOND
-- TICKS_PER_SECOND
+- DEFAULT_HASHES_PER_SECOND
+- DEFAULT_TICKS_PER_SECOND
 y:
 AVERAGE_TPS_BENCH1
 начальный датасет: data/af_train_100.csv (копия data/out_slhc_design_train_100.csv)
@@ -27,12 +27,14 @@ AVERAGE_TPS_BENCH1
 
 SOLANA_PARAMS = [
     "NUM_THREADS",
-    "TICKS_PER_SLOT",
+    "DEFAULT_TICKS_PER_SLOT",
     "RECV_BATCH_MAX_CPU",
     "ITER_BATCH_SIZE",
-    "HASHES_PER_SECOND",
-    "TICKS_PER_SECOND"
+    "DEFAULT_HASHES_PER_SECOND",
+    "DEFAULT_TICKS_PER_SECOND"
 ]
+
+FACTORY_PATH = "/Users/19846310/personal/GBC-AI/factory/"
 
 current_env = os.environ.copy()
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -165,8 +167,8 @@ def blackbox(X: pd.Series, factory_path: str, delay: int = 80) -> pd.Series:
     return result_series
 
 if __name__ == "__main__":
-    feature_cols = ['NUM_THREADS', 'TICKS_PER_SLOT', 'RECV_BATCH_MAX_CPU',
-                    'ITER_BATCH_SIZE', 'HASHES_PER_SECOND', 'TICKS_PER_SECOND']
+    feature_cols = ['NUM_THREADS', 'DEFAULT_TICKS_PER_SLOT', 'RECV_BATCH_MAX_CPU',
+                    'ITER_BATCH_SIZE', 'DEFAULT_HASHES_PER_SECOND', 'DEFAULT_TICKS_PER_SECOND']
     target_col = ["AVERAGE_TPS_BENCH1"]
 
     # lower and upper bound for X candidates search
@@ -204,7 +206,7 @@ if __name__ == "__main__":
         candidate_series = pd.Series(data=candidate, index=feature_cols)
 
         print(f"Calculating blackbox for candidate {i+1}...")
-        result_series = blackbox(candidate_series, "/Users/19846310/personal/GBC-AI/factory/")
+        result_series = blackbox(candidate_series, FACTORY_PATH)
         print(f"Resulting {target_col}: {result_series[target_col]}")
 
         print(f"Saving results to {data_path}...")

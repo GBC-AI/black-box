@@ -11,11 +11,11 @@ import re
 """
 Провести эксперимент с параметрами Solana:
 - NUM_THREADS
-- TICKS_PER_SLOT
+- DEFAULT_TICKS_PER_SLOT
 - RECV_BATCH_MAX_CPU
 - ITER_BATCH_SIZE
-- HASHES_PER_SECOND
-- TICKS_PER_SECOND
+- DEFAULT_HASHES_PER_SECOND
+- DEFAULT_TICKS_PER_SECOND
 на основе CSV файлов:
 - data/slhc_design_t*.csv -- 1 x Benchmark 1, delay 80
 - data/slhc_design_for_variance.csv -- 10 x Benchmark 1, delay 80
@@ -23,12 +23,15 @@ import re
 
 SOLANA_PARAMS = [
     "NUM_THREADS",
-    "TICKS_PER_SLOT",
+    "DEFAULT_TICKS_PER_SLOT",
     "RECV_BATCH_MAX_CPU",
     "ITER_BATCH_SIZE",
-    "HASHES_PER_SECOND",
-    "TICKS_PER_SECOND"
+    "DEFAULT_HASHES_PER_SECOND",
+    "DEFAULT_TICKS_PER_SECOND"
 ]
+
+FACTORY_PATH = "/Users/19846310/personal/GBC-AI/factory/"
+DATA_FILE = "out_slhc_design_train_100.csv"
 
 current_env = os.environ.copy()
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -183,8 +186,8 @@ def blackbox(data_path: str, factory_path: str, results_path: str, iters: int = 
 
 
 blackbox(
-    data_path="/Users/19846310/personal/GBC-AI/black-box/data/slhc_design_for_variance.csv",
-    factory_path="/Users/19846310/personal/GBC-AI/factory/",
-    results_path="/Users/19846310/personal/GBC-AI/black-box/out_slhc_design_for_variance.csv",
+    data_path=os.path.join("data", DATA_FILE),
+    factory_path=FACTORY_PATH,
+    results_path=f"out_{DATA_FILE}",
     iters=10
 )

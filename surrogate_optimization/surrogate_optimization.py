@@ -168,8 +168,8 @@ class BayesianOptimizer():
             
 if __name__ == "__main__":
     # feature columns
-    feature_cols = ['NUM_THREADS', 'TICKS_PER_SLOT', 'RECV_BATCH_MAX_CPU',
-        'ITER_BATCH_SIZE', 'HASHES_PER_SECOND', 'TICKS_PER_SECOND']
+    feature_cols = ['NUM_THREADS', 'DEFAULT_TICKS_PER_SLOT', 'RECV_BATCH_MAX_CPU',
+        'ITER_BATCH_SIZE', 'DEFAULT_HASHES_PER_SECOND', 'DEFAULT_TICKS_PER_SECOND']
     # y column
     target_col = ["AVERAGE_TPS_BENCH1"]
     # inital dataset for training
