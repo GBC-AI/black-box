@@ -32,6 +32,7 @@ SOLANA_PARAMS = [
 
 FACTORY_PATH = "/Users/19846310/personal/GBC-AI/factory/"
 DATA_FILE = "slhc_design_train_100.csv"
+ITERS = 1
 
 current_env = os.environ.copy()
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -189,5 +190,5 @@ blackbox(
     data_path=os.path.join("data", DATA_FILE),
     factory_path=FACTORY_PATH,
     results_path=f"out_{DATA_FILE}",
-    iters=10
+    iters=ITERS
 )
