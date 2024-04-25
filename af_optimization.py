@@ -1,5 +1,6 @@
 import subprocess
 import os
+import torch
 import numpy as np
 import shutil
 import toml
@@ -172,9 +173,11 @@ if __name__ == "__main__":
                     'ITER_BATCH_SIZE', 'DEFAULT_HASHES_PER_SECOND', 'DEFAULT_TICKS_PER_SECOND']
     target_col = ["AVERAGE_TPS_BENCH1"]
 
-    # lower and upper bound for X candidates search
-    lb = np.array([3, 850, 850, 53, 1700000, 136])
-    ub = np.array([5, 1150, 1150, 73, 2300000, 184])
+    # lower and upper bound for X candidates seacrh
+    lb = torch.tensor([3, 53, 850, 850 , 1700000, 136])
+    ub = torch.tensor([5, 73, 1150, 1150 , 2300000, 184])
+    bounds = torch.stack([lb.type(torch.float64), ub.type(torch.float64)])
+    standard_bounds = np.stack([[0.0]*6, [1.0]*6])
 
     # required length of dataset
     N = 100 + 100
@@ -201,7 +204,7 @@ if __name__ == "__main__":
         X = af_train[feature_cols].values
         y = af_train[target_col].values
 
-        botorch_optim = BayesianOptimizer(lower_bound=lb, upper_bound=ub,is_scaler=True)
+        botorch_optim = BayesianOptimizer(bounds, standard_bounds)
         if af_type == "EI":
             candidate = botorch_optim.optimize_EI(X, y)
         elif af_type == "TS":

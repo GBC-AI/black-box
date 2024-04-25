@@ -1,17 +1,12 @@
-import random
-import gpytorch
-import botorch
 import torch
 import pandas as pd
 import warnings 
 warnings.simplefilter('ignore')
-import os
 from botorch.models import SingleTaskGP
 from gpytorch.mlls import ExactMarginalLogLikelihood
 from botorch.fit import fit_gpytorch_mll
 from botorch.acquisition import UpperConfidenceBound, ExpectedImprovement
 from botorch.optim import optimize_acqf
-from sklearn.preprocessing import MinMaxScaler
 from botorch.utils.sampling import draw_sobol_samples
 from botorch.utils.transforms import unnormalize, normalize
 
