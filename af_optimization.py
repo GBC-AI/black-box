@@ -35,6 +35,7 @@ SOLANA_PARAMS = [
 ]
 
 FACTORY_PATH = "/Users/19846310/personal/GBC-AI/factory/"
+AF_TYPE = os.getenv("AF_TYPE", "EI")
 
 current_env = os.environ.copy()
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -178,12 +179,12 @@ if __name__ == "__main__":
     # required length of dataset
     N = 100 + 100
 
-    # DYCORS optimization
-    af_type = "DYCORS"
+    # AF optimization
+    af_type = AF_TYPE
 
     data_path = f"af_train_{af_type}.csv"
 
-    # dataset for training: af_train_dycors.csv if exists, default starting dataset if not
+    # dataset for training: af_train_<af_type>.csv if exists, default starting dataset if not
     if os.path.isfile(data_path):
         af_train = pd.read_csv(data_path)
     else:
@@ -201,8 +202,18 @@ if __name__ == "__main__":
         y = af_train[target_col].values
 
         botorch_optim = BayesianOptimizer(lower_bound=lb, upper_bound=ub,is_scaler=True)
-        candidate = botorch_optim.optimize_DYCORS(X, y)
-        print(f"DYCORS candidate {candidate}")
+        if af_type == "EI":
+            candidate = botorch_optim.optimize_EI(X, y)
+        elif af_type == "TS":
+            candidate = botorch_optim.optimize_TS(X, y)
+        elif af_type == "UCB":
+            candidate = botorch_optim.optimize_UCB(X, y)
+        elif af_type == "DYCORS":
+            candidate = botorch_optim.optimize_DYCORS(X, y)
+        else:
+            print(f"{af_type} optimization not implemented.")
+            exit(1)
+        print(f"{af_type} candidate {candidate}")
         candidate_series = pd.Series(data=candidate, index=feature_cols)
 
         print(f"Calculating blackbox for candidate {i+1}...")
