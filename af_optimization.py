@@ -121,7 +121,7 @@ def blackbox(X: pd.Series, factory_path: str, delay: int = 80) -> pd.Series:
     print(f"Starting blockchain...")
     chain_uid = uuid.uuid4().hex
     subprocess.run(
-        f"python3 start_chain.py -v=3 -i=t2.2xlarge -e=test_blockchain -c=config.toml -r=us-east-1 -u {chain_uid}",
+        f"python3 start_chain.py -v=3 -i=t2.2xlarge -e=test_blockchain{AF_TYPE} -c=config.toml -r=us-east-1 -u {chain_uid}",
         shell=True,
         env=current_env,
         cwd=factory_path,
