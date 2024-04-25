@@ -34,7 +34,7 @@ SOLANA_PARAMS = [
     "DEFAULT_TICKS_PER_SECOND"
 ]
 
-FACTORY_PATH = "/Users/19846310/personal/GBC-AI/factory/"
+FACTORY_PATH = os.getenv("FACTORY_PATH", "/home/ec2-user/solana_experiments/slhc_design/factory/")
 AF_TYPE = os.getenv("AF_TYPE", "EI")
 
 current_env = os.environ.copy()
