@@ -36,6 +36,7 @@ SOLANA_PARAMS = [
 ]
 
 FACTORY_PATH = os.getenv("FACTORY_PATH", "/home/ec2-user/solana_experiments/slhc_design/factory/")
+CHAIN_REGION = os.getenv("CHAIN_REGION", "us-east-1")
 AF_TYPE = os.getenv("AF_TYPE", "EI")
 
 current_env = os.environ.copy()
@@ -121,7 +122,7 @@ def blackbox(X: pd.Series, factory_path: str, delay: int = 80) -> pd.Series:
     print(f"Starting blockchain...")
     chain_uid = uuid.uuid4().hex
     subprocess.run(
-        f"python3 start_chain.py -v=3 -i=t2.2xlarge -e=test_blockchain{AF_TYPE} -c=config.toml -r=us-east-1 -u {chain_uid}",
+        f"python3 start_chain.py -v=3 -i=t2.2xlarge -e=test_blockchain{AF_TYPE} -c=config.toml -r={CHAIN_REGION} -u {chain_uid}",
         shell=True,
         env=current_env,
         cwd=factory_path,
