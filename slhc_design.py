@@ -30,9 +30,9 @@ SOLANA_PARAMS = [
     "DEFAULT_TICKS_PER_SECOND"
 ]
 
-FACTORY_PATH = "/Users/19846310/personal/GBC-AI/factory/"
-DATA_FILE = "slhc_design_train_100.csv"
-ITERS = 1
+FACTORY_PATH = os.getenv("FACTORY_PATH", "/home/ec2-user/solana_experiments/slhc_design/factory/")
+DATA_FILE = os.getenv("DATA_FILE", "slhc_design_train_100.csv")
+ITERS = int(os.getenv("ITERS", "1"))
 
 current_env = os.environ.copy()
 current_dir = os.path.dirname(os.path.realpath(__file__))
